@@ -85,7 +85,7 @@ namespace SwarmFeatures.SwarmAutoProxy
                 return new ProxyHost();
 
             var port = service.Ports[0];
-            var address = $"{node.Hostname}:{port.PublishedPort}";
+            var address = $"{node.Address}:{port.PublishedPort}";
 
             return new ProxyHost
             {
