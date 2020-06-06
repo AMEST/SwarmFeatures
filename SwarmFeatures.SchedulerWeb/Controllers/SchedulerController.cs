@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Quartz;
 using SwarmFeatures.SchedulerWeb.Scheduler;
 using SwarmFeatures.SwarmControl;
 
@@ -37,6 +38,20 @@ namespace SwarmFeatures.SchedulerWeb.Controllers
         {
             var nodes = await _swarmManager.GetNodes();
             return Ok(nodes);
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> AddTask([FromRoute] string id, [FromQuery] string cron)
+        {
+            await _manager.AddQuartzTask(id, cron);
+            return Ok();
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Tasks()
+        {
+            var tasksList = await _manager.ListQuartzTasks();
+            return Ok(tasksList);
         }
     }
 }

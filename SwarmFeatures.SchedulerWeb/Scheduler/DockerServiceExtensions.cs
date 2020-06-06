@@ -14,5 +14,15 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             else
                 service.Labels.Add(SchedulerLabels.LastSchedule, currentTimeStamp);
         }
+
+        public static string GetServiceCron(this DockerService service)
+        {
+            return service.Labels[SchedulerLabels.Schedule];
+        }
+
+        public static string GetScheduleEnabled(this DockerService service)
+        {
+            return service.Labels[SchedulerLabels.Enable];
+        }
     }
 }

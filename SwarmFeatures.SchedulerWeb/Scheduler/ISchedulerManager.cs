@@ -10,5 +10,8 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
         Task StopScheduledService(string id);
         Task<List<DockerService>> GetScheduledDockerServices();
         Task<DockerService> GetScheduledDockerServiceById(string id);
+        Task AddQuartzTask(string id, string cron = "0 * * * * ? *");
+        Task RemoveQuartzTask(string id);
+        Task<List<DockerService>> ListQuartzTasks();
     }
 }
