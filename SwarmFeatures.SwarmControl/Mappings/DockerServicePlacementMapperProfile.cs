@@ -10,7 +10,7 @@ namespace SwarmFeatures.SwarmControl.Mappings
         {
             CreateMap<Placement, DockerServicePlacement>()
                 .ForMember(d => d.Constraints, opt => opt.MapFrom(s => s.Constraints));
-            CreateMap<DockerServicePlacement, Placement> ()
+            CreateMap<DockerServicePlacement, Placement>()
                 .ForMember(d => d.Constraints, opt => opt.MapFrom(s => s.Constraints));
         }
     }

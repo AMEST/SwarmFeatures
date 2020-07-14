@@ -15,7 +15,7 @@ namespace SwarmFeatures.SchedulerWeb
             services.AddHostedService<QuartzHostedService>();
             services.AddHostedService<DockerJobHostedService>();
             services.AddSingleton<ISchedulerManager, SchedulerManager>();
-            services.AddSingleton<IJobFactory,JobFactory>();
+            services.AddSingleton<IJobFactory, JobFactory>();
             services.AddTransient<SwarmExecuteJob>();
             services.AddSingleton(CreateScheduler);
 

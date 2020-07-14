@@ -21,6 +21,5 @@ namespace SwarmFeatures.SwarmAutoProxy.Controllers
 
             return Ok(hosts);
         }
-        
     }
 }

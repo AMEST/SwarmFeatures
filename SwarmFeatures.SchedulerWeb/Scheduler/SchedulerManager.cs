@@ -27,7 +27,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
 
             var service = await GetScheduledServiceById(id);
 
-            if(service == null)
+            if (service == null)
                 return;
 
             service.Replicas = 1;
@@ -58,7 +58,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
         {
             var services = await _manager.GetDockerServices();
             return services?.Where(service => service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)))
-                    .ToList();
+                .ToList();
         }
 
         /// <inheritdoc />
@@ -66,20 +66,20 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
         {
             var service = await _manager.GetServiceById(id);
             return service != null
-                && service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)) 
-                    ? service 
-                    : null;
+                   && service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable))
+                ? service
+                : null;
         }
 
         /// <inheritdoc />
         public async Task AddQuartzTask(string id, string cron = "0 * * * * ? *")
         {
             var service = await GetScheduledServiceById(id);
-            IJobDetail jobDetail = JobBuilder.Create<SwarmExecuteJob>()
+            var jobDetail = JobBuilder.Create<SwarmExecuteJob>()
                 .WithIdentity(id)
                 .WithDescription(service.Name)
                 .Build();
-            ITrigger trigger = TriggerBuilder.Create()
+            var trigger = TriggerBuilder.Create()
                 .WithIdentity(id)
                 .StartNow()
                 .WithCronSchedule(cron)
@@ -105,7 +105,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             foreach (var jobKey in await _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
             {
                 var service = await GetScheduledServiceById(jobKey.Name);
-                result.Add(service ?? new DockerService { Id = jobKey.Name });
+                result.Add(service ?? new DockerService {Id = jobKey.Name});
             }
 
             return result;

@@ -11,6 +11,7 @@ namespace SwarmFeatures.SwarmAutoProxy.Configuration
         {
             _configuration = configuration;
         }
+
         public string DockerUri => GetValue("DockerClient:Uri");
         public bool AutoSwitchConnectionToLeader => false;
 

@@ -34,7 +34,8 @@ namespace SwarmFeatures.SwarmAutoProxy
                 options.MessageHandler = new HttpClientHandler
                 {
                     ClientCertificateOptions = ClientCertificateOption.Manual,
-                    ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true
+                    ServerCertificateCustomValidationCallback =
+                        (httpRequestMessage, cert, cetChain, policyErrors) => true
                 };
             });
             services.AddMvc();
@@ -43,11 +44,8 @@ namespace SwarmFeatures.SwarmAutoProxy
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
             app.UseWebSockets();
             app.RunProxy();
             app.UseMvc();

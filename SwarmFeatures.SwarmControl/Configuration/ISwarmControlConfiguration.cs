@@ -5,6 +5,5 @@
         string DockerUri { get; }
 
         bool AutoSwitchConnectionToLeader { get; }
-
     }
 }
