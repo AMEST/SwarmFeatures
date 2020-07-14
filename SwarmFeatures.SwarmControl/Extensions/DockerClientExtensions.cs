@@ -9,7 +9,7 @@ namespace SwarmFeatures.SwarmControl.Extensions
         {
             var leader = client.Swarm.ListNodesAsync().GetAwaiter().GetResult()
                 .FirstOrDefault(node => node.ManagerStatus.Leader);
-            return leader.Status.Addr;
+            return leader?.Status.Addr;
         }
     }
 }

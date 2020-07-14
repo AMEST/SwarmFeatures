@@ -30,7 +30,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             if (service == null)
                 return;
 
-            service.Replicas = 1;
+            service.Replicas = (ulong) service.GetScheduleReplicas();
             service.SetTimestamp();
 
             await _manager.UpdateService(service);

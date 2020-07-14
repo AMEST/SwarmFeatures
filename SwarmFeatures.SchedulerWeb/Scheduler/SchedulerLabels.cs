@@ -7,5 +7,7 @@
         public static string Schedule = "sf.scheduler.cron";
 
         public static string LastSchedule = "sf.scheduler.lastSchedule";
+
+        public static string Replicas = "sf.scheduler.replicas";
     }
 }

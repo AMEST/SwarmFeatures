@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace SwarmFeatures.SchedulerWeb.Workers
 {
-    public class DockerJobHostedService : IHostedService
+    public class JobSearchService : IHostedService
     {
         private readonly ISchedulerManager _schedulerManager;
         private readonly ILogger _logger;
         private Timer _swarmTimer;
 
-        public DockerJobHostedService(ISchedulerManager schedulerManager, ILogger logger)
+        public JobSearchService(ISchedulerManager schedulerManager, ILogger logger)
         {
             _schedulerManager = schedulerManager;
             _logger = logger;

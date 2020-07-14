@@ -13,7 +13,7 @@ namespace SwarmFeatures.SchedulerWeb
         public static IServiceCollection AddSwarmSchedulerModule(this IServiceCollection services)
         {
             services.AddHostedService<QuartzHostedService>();
-            services.AddHostedService<DockerJobHostedService>();
+            services.AddHostedService<JobSearchService>();
             services.AddSingleton<ISchedulerManager, SchedulerManager>();
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddTransient<SwarmExecuteJob>();
