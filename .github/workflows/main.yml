@@ -30,3 +30,12 @@ jobs:
         target: proxy
         tag_with_ref: true
         push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') }}
+    - name: Build And Push Service Scheduler
+      uses: docker/build-push-action@v1.1.0
+      with:
+        repository: eluki/swarm-scheduler
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        target: scheduler
+        tag_with_ref: true
+        push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') }}
