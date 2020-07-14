@@ -22,10 +22,10 @@ jobs:
         # Runs a single command using the runners shell
     - name: ListDir
       run: |
-        ls -la \
-        echo "CurDir" \
-        echo $(pwd) \
-        cd .. \
+        ls -la &&
+        echo "CurDir" &&
+        echo $(pwd) &&
+        cd .. &&
         echo $(ls -la)
 
     - name: Build And Push SwarmAutoProxy
