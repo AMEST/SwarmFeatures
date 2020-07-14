@@ -23,17 +23,18 @@ namespace SwarmFeatures.SchedulerWeb.Controllers
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _manager.GetScheduledDockerServices());
+            return Ok(await _manager.GetScheduledServices());
         }
 
         [HttpGet("[action]/{id}")]
         public async Task<IActionResult> Run([FromRoute] string id)
         {
-            await _manager.RunScheduledService(id);
+            await _manager.RunService(id);
             return Ok();
         }
 
         [HttpGet("[action]")]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Nodes()
         {
             var nodes = await _swarmManager.GetNodes();
@@ -48,6 +49,7 @@ namespace SwarmFeatures.SchedulerWeb.Controllers
         }
 
         [HttpGet("[action]")]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Tasks()
         {
             var tasksList = await _manager.ListQuartzTasks();

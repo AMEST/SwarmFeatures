@@ -18,9 +18,9 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await _schedulerManager.StopScheduledService(context.JobDetail.Key.Name);
-            await _schedulerManager.RunScheduledService(context.JobDetail.Key.Name);
-            _logger.Debug($"Job key = {context.JobDetail.Key}; description = {context.JobDetail.Description}");
+            await _schedulerManager.StopService(context.JobDetail.Key.Name);
+            await _schedulerManager.RunService(context.JobDetail.Key.Name);
+            _logger.Debug("Container {ContainerID} running by quartz", context.JobDetail.Description);
         }
     }
 }

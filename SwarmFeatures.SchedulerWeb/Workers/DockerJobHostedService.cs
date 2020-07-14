@@ -35,7 +35,7 @@ namespace SwarmFeatures.SchedulerWeb.Workers
 
         private async void Tick(object state)
         {
-            var dockerServices = await _schedulerManager.GetScheduledDockerServices();
+            var dockerServices = await _schedulerManager.GetScheduledServices();
             var quartzJobs = await _schedulerManager.ListQuartzTasks();
             foreach (var service in dockerServices)
             {

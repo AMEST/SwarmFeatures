@@ -20,11 +20,12 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             _scheduler = scheduler;
         }
 
-        public async Task RunScheduledService(string id)
+        /// <inheritdoc />
+        public async Task RunService(string id)
         {
-            await StopScheduledService(id);
+            await StopService(id);
 
-            var service = await GetScheduledDockerServiceById(id);
+            var service = await GetScheduledServiceById(id);
 
             service.Replicas = 1;
             service.SetTimestamp();
@@ -34,9 +35,10 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             await Task.Delay(500);
         }
 
-        public async Task StopScheduledService(string id)
+        /// <inheritdoc />
+        public async Task StopService(string id)
         {
-            var service = await GetScheduledDockerServiceById(id);
+            var service = await GetScheduledServiceById(id);
 
             service.Replicas = 0;
 
@@ -45,22 +47,25 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             await Task.Delay(1000);
         }
 
-        public async Task<List<DockerService>> GetScheduledDockerServices()
+        /// <inheritdoc />
+        public async Task<List<DockerService>> GetScheduledServices()
         {
             var services = await _manager.GetDockerServices();
             return services.Where(service => service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)))
                 .ToList();
         }
 
-        public async Task<DockerService> GetScheduledDockerServiceById(string id)
+        /// <inheritdoc />
+        public async Task<DockerService> GetScheduledServiceById(string id)
         {
             var service = await _manager.GetServiceById(id);
             return service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)) ? service : null;
         }
 
+        /// <inheritdoc />
         public async Task AddQuartzTask(string id, string cron = "0 * * * * ? *")
         {
-            var service = await GetScheduledDockerServiceById(id);
+            var service = await GetScheduledServiceById(id);
             IJobDetail jobDetail = JobBuilder.Create<SwarmExecuteJob>()
                 .WithIdentity(id)
                 .WithDescription(service.Name)
@@ -73,6 +78,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             await _scheduler.ScheduleJob(jobDetail, trigger);
         }
 
+        /// <inheritdoc />
         public async Task RemoveQuartzTask(string id)
         {
             foreach (var job in await _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
@@ -83,12 +89,13 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             }
         }
 
+        /// <inheritdoc />
         public async Task<List<DockerService>> ListQuartzTasks()
         {
             var result = new List<DockerService>();
             foreach (var jobKey in await _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
             {
-                var service = await GetScheduledDockerServiceById(jobKey.Name);
+                var service = await GetScheduledServiceById(jobKey.Name);
                 result.Add(service);
             }
 
