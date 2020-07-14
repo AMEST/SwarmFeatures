@@ -21,7 +21,8 @@ jobs:
     steps:
     - name: Build And Push SwarmAutoProxy
       uses: docker/build-push-action@v1.1.0
-      repository: eluki/swarm-auto-proxy
-      target: proxy
-      tag_with_ref: true
-      push: false
+      with:
+        repository: eluki/swarm-auto-proxy
+        target: proxy
+        tag_with_ref: true
+        push: false
