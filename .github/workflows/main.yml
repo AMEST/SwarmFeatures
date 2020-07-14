@@ -21,7 +21,12 @@ jobs:
     steps:
         # Runs a single command using the runners shell
     - name: ListDir
-      run: ls -la
+      run: |
+        ls -la,
+        echo "CurDir",
+        echo $(pwd),
+        cd .. ,
+        echo $(ls -la)
 
     - name: Build And Push SwarmAutoProxy
       uses: docker/build-push-action@v1.1.0
