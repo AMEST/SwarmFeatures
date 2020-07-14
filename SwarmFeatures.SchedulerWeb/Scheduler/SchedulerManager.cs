@@ -27,6 +27,9 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
 
             var service = await GetScheduledServiceById(id);
 
+            if(service == null)
+                return;
+
             service.Replicas = 1;
             service.SetTimestamp();
 
@@ -40,6 +43,9 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
         {
             var service = await GetScheduledServiceById(id);
 
+            if (service == null)
+                return;
+
             service.Replicas = 0;
 
             await _manager.UpdateService(service);
@@ -51,15 +57,18 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
         public async Task<List<DockerService>> GetScheduledServices()
         {
             var services = await _manager.GetDockerServices();
-            return services.Where(service => service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)))
-                .ToList();
+            return services?.Where(service => service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)))
+                    .ToList();
         }
 
         /// <inheritdoc />
         public async Task<DockerService> GetScheduledServiceById(string id)
         {
             var service = await _manager.GetServiceById(id);
-            return service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)) ? service : null;
+            return service != null
+                && service.Labels.Any(label => label.Key.Equals(SchedulerLabels.Enable)) 
+                    ? service 
+                    : null;
         }
 
         /// <inheritdoc />
@@ -71,7 +80,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
                 .WithDescription(service.Name)
                 .Build();
             ITrigger trigger = TriggerBuilder.Create()
-                .WithIdentity("MailingTrigger", "default")
+                .WithIdentity(id)
                 .StartNow()
                 .WithCronSchedule(cron)
                 .Build();
@@ -96,7 +105,7 @@ namespace SwarmFeatures.SchedulerWeb.Scheduler
             foreach (var jobKey in await _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
             {
                 var service = await GetScheduledServiceById(jobKey.Name);
-                result.Add(service);
+                result.Add(service ?? new DockerService { Id = jobKey.Name });
             }
 
             return result;

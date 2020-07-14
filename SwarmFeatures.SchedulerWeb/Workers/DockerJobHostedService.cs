@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using Serilog;
+using SwarmFeatures.SchedulerWeb.Scheduler;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Quartz.Xml.JobSchedulingData20;
-using Serilog;
-using SwarmFeatures.SchedulerWeb.Scheduler;
 
 namespace SwarmFeatures.SchedulerWeb.Workers
 {
@@ -47,6 +46,12 @@ namespace SwarmFeatures.SchedulerWeb.Workers
 
                 await _schedulerManager.AddQuartzTask(service.Id, service.GetServiceCron());
                 _logger.Information($"Service {service.Name} added to cron with {service.GetServiceCron()}");
+            }
+
+            foreach (var job in quartzJobs.Where(job => !dockerServices.Any(service => service.Id == job.Id)))
+            {
+                _logger.Information("Job {JobId} not associated with Service. Deleting job", job.Id);
+                await _schedulerManager.RemoveQuartzTask(job.Id);
             }
         }
     }
