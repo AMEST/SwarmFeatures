@@ -1,12 +1,23 @@
 version: '3.7'
 
 services:
-  autoproxy:
+  proxy:
     image: eluki/swarm-auto-proxy:latest
     environment:
       - "DockerClient:Uri=unix:///var/run/docker.sock"
     ports:
       - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+          
+  scheduler:
+    image: eluki/swarm-scheduler:latest
+    environment:
+      - "DockerClient:Uri=unix:///var/run/docker.sock"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:

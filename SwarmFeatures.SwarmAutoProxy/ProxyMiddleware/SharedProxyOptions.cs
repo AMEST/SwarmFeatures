@@ -37,13 +37,10 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// </summary>
         public int? WebSocketBufferSize
         {
-            get { return _webSocketBufferSize; }
+            get => _webSocketBufferSize;
             set
             {
-                if (value.HasValue && value.Value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
+                if (value.HasValue && value.Value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
                 _webSocketBufferSize = value;
             }
         }

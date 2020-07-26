@@ -11,12 +11,11 @@ namespace SwarmFeatures.SwarmAutoProxy
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseSerilog((ctx, config) =>
-                {
-                    config.ReadFrom.Configuration(ctx.Configuration);
-                });
+                .UseSerilog((ctx, config) => { config.ReadFrom.Configuration(ctx.Configuration); });
+        }
     }
 }

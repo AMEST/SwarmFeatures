@@ -47,6 +47,7 @@ namespace SwarmFeatures.SwarmControl.Mappings
         {
             return Mapper.Map<IEnumerable<DockerNode>>(source);
         }
+
         public static DockerNode ToEntity(this NodeListResponse source)
         {
             return Mapper.Map<DockerNode>(source);

@@ -19,14 +19,8 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// <param name="baseUri">Destination base uri</param>
         public static void RunProxy(this IApplicationBuilder app, Uri baseUri)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-            if (baseUri == null)
-            {
-                throw new ArgumentNullException(nameof(baseUri));
-            }
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (baseUri == null) throw new ArgumentNullException(nameof(baseUri));
 
             var options = new ProxyOptions
             {
@@ -44,10 +38,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// <param name="app"></param>
         public static void RunProxy(this IApplicationBuilder app)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            if (app == null) throw new ArgumentNullException(nameof(app));
             var options = new ProxyOptions();
             app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
         }
@@ -59,14 +50,8 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// <param name="options">Proxy options</param>
         public static void RunProxy(this IApplicationBuilder app, ProxyOptions options)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
             app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
         }
@@ -78,14 +63,8 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// <param name="destinationUri">Destination Uri</param>
         public static async Task ProxyRequest(this HttpContext context, Uri destinationUri)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            if (destinationUri == null)
-            {
-                throw new ArgumentNullException(nameof(destinationUri));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (destinationUri == null) throw new ArgumentNullException(nameof(destinationUri));
 
             if (context.WebSockets.IsWebSocketRequest)
             {
@@ -98,16 +77,13 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
                 using (var requestMessage = context.CreateProxyHttpRequest(destinationUri))
                 {
                     var prepareRequestHandler = proxyService.Options.PrepareRequest;
-                    if (prepareRequestHandler != null)
-                    {
-                        await prepareRequestHandler(context.Request, requestMessage);
-                    }
+                    if (prepareRequestHandler != null) await prepareRequestHandler(context.Request, requestMessage);
 
-                    using (var responseMessage = await context.SendProxyHttpRequest(requestMessage)){
+                    using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
+                    {
                         var prepearResponseHandler = proxyService.Options.PrepareResponse;
-                        if (null != prepearResponseHandler){
-                            await prepearResponseHandler(context.Request,responseMessage);
-                        }
+                        if (null != prepearResponseHandler)
+                            await prepearResponseHandler(context.Request, responseMessage);
                         await context.CopyProxyHttpResponse(responseMessage);
                     }
                 }

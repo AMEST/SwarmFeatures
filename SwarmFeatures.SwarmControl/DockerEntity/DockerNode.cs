@@ -17,6 +17,5 @@ namespace SwarmFeatures.SwarmControl.DockerEntity
         public string Hostname { get; set; }
 
         public string Address { get; set; }
-
     }
 }

@@ -45,7 +45,7 @@ namespace SwarmFeatures.SwarmAutoProxy
 
         private async Task<List<ProxyHost>> GetAllProxyHost()
         {
-            if ((_proxyHostsCache == null) || (_proxyHostsCache != null && _proxyHostsCache.IsEmpty) ||
+            if (_proxyHostsCache == null || _proxyHostsCache != null && _proxyHostsCache.IsEmpty ||
                 _cacheTime.AddSeconds(10).ToUnixTimeSeconds() < DateTimeOffset.Now.ToUnixTimeSeconds())
             {
                 var allServices = await _manager.GetDockerServices();
@@ -73,7 +73,7 @@ namespace SwarmFeatures.SwarmAutoProxy
 
         private ProxyHost CreateHost(DockerService service, DockerNode node)
         {
-            if(service.Labels.ContainsKey(ProxyLabels.Address))
+            if (service.Labels.ContainsKey(ProxyLabels.Address))
                 return new ProxyHost
                 {
                     Address = service.Labels[ProxyLabels.Address],
@@ -93,7 +93,6 @@ namespace SwarmFeatures.SwarmAutoProxy
                 Hostname = service.Labels[ProxyLabels.Hostname],
                 ServiceName = service.Name
             };
-
         }
     }
 }

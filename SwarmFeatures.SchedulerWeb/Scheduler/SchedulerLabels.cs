@@ -4,8 +4,10 @@
     {
         public static string Enable = "sf.scheduler.enable";
 
-        public static string Schedule = "sf.scheduler.schedule";
+        public static string Schedule = "sf.scheduler.cron";
 
         public static string LastSchedule = "sf.scheduler.lastSchedule";
+
+        public static string Replicas = "sf.scheduler.replicas";
     }
 }

@@ -5,7 +5,8 @@ namespace SwarmFeatures.SwarmControl.Extensions
 {
     public static class SwarmControlRegisterExtensions
     {
-        public static IServiceCollection AddSwarmControlModule(this IServiceCollection services, ISwarmControlConfiguration configuration)
+        public static IServiceCollection AddSwarmControlModule(this IServiceCollection services,
+            ISwarmControlConfiguration configuration)
         {
             services.AddSingleton<ISwarmManager, SwarmManager>()
                 .AddSingleton<IDockerClientFactory, DockerClientFactory>()

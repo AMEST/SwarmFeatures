@@ -29,15 +29,9 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         public ProxyMiddleware(RequestDelegate next, IProxyHostResolver hostResolver, ILogger logger,
             IOptions<ProxyOptions> options)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
+            if (next == null) throw new ArgumentNullException(nameof(next));
 
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
             _next = next;
             _hostResolver = hostResolver;
@@ -47,10 +41,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
 
         public Task Invoke(HttpContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             Uri uri;
             if (!_options.Host.HasValue)
