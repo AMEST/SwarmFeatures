@@ -1,5 +1,5 @@
 # Simple service scheduler for periodic launch containers   
-**[DockerHub](https://hub.docker.com/repository/docker/eluki/swarm-scheduler)**
+**[DockerHub](https://hub.docker.com/r/eluki/swarm-scheduler)**
 
 This Scheduler automatic find services with special labels, read cron and add service to schedule. Scheduler run containers in service by cron rule.   
 For using scheduler, add labels to service: 
