@@ -25,7 +25,7 @@ version: '3.7'
 
 ```
 
-### Example stack for exposed service:
+### Example stack:
 ```yaml
 version: "3.7"
 
@@ -35,9 +35,6 @@ services:
     command: date
     deploy:
       labels:
-        #- "swarm.cronjob.enable=true"
-        #- "swarm.cronjob.schedule=0 * * * * *"
-        #- "swarm.cronjob.skip-running=false"
         - "sf.scheduler.enable=true"
         - "sf.scheduler.cron=*/10 * * * * ? *"
       replicas: 0
