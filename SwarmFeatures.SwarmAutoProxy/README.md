@@ -1,5 +1,5 @@
 # Simple proxy server for docker swarm   
-**[DockerHub](https://hub.docker.com/repository/docker/eluki/swarm-auto-proxy)**
+**[DockerHub](https://hub.docker.com/r/eluki/swarm-auto-proxy)**
 
 This proxy server automatically finds services to which traffic should be redirected.   
 For example, the service is published on port 9000, but each time you have to remember to specify the port in the address. But using this proxy, you can specify three labels at the service: 
