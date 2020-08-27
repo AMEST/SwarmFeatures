@@ -1,28 +1,26 @@
-﻿using System;
+﻿using Docker.DotNet;
+using Docker.DotNet.Models;
+using SwarmFeatures.SwarmControl.DockerEntity;
+using SwarmFeatures.SwarmControl.Mappings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Docker.DotNet;
-using Docker.DotNet.Models;
-using SwarmFeatures.SwarmControl.DockerEntity;
-using SwarmFeatures.SwarmControl.Extensions;
-using SwarmFeatures.SwarmControl.Mappings;
 
 namespace SwarmFeatures.SwarmControl
 {
     internal class SwarmManager : ISwarmManager
     {
-        private readonly DockerClient _dockerClient;
+        private readonly Lazy<DockerClient> _dockerClient;
 
         public SwarmManager(IDockerClientFactory dockerClientFactory)
         {
-            _dockerClient = dockerClientFactory.CreateDockerClient();
-            _dockerClient.GetLeaderAddress();
+            _dockerClient = new Lazy<DockerClient>(dockerClientFactory.CreateDockerClient);
         }
 
         public async Task RemoveService(DockerService dockerService)
         {
-            await _dockerClient.Swarm.RemoveServiceAsync(dockerService.Id);
+            await _dockerClient.Value.Swarm.RemoveServiceAsync(dockerService.Id);
         }
 
         public async Task UpdateService(DockerService dockerService)
@@ -41,12 +39,12 @@ namespace SwarmFeatures.SwarmControl
             serviceUpdateParams.Service.TaskTemplate.Placement = dockerService.Placement.ToObject();
             serviceUpdateParams.Service.TaskTemplate.ForceUpdate++;
 
-            await _dockerClient.Swarm.UpdateServiceAsync(dockerService.Id, serviceUpdateParams);
+            await _dockerClient.Value.Swarm.UpdateServiceAsync(dockerService.Id, serviceUpdateParams);
         }
 
         public async Task<List<DockerService>> GetDockerServices()
         {
-            var services = await _dockerClient.Swarm.ListServicesAsync();
+            var services = await _dockerClient.Value.Swarm.ListServicesAsync();
             return services.ToEntity();
         }
 
@@ -57,13 +55,13 @@ namespace SwarmFeatures.SwarmControl
 
         public async Task<IEnumerable<DockerNode>> GetNodes()
         {
-            var nodes = await _dockerClient.Swarm.ListNodesAsync();
+            var nodes = await _dockerClient.Value.Swarm.ListNodesAsync();
             return nodes.ToEntity();
         }
 
         private async Task<SwarmService> GetService(DockerService dockerService)
         {
-            return (await _dockerClient.Swarm.ListServicesAsync())
+            return (await _dockerClient.Value.Swarm.ListServicesAsync())
                 .FirstOrDefault(s => s.ID.Equals(dockerService.Id));
         }
     }
