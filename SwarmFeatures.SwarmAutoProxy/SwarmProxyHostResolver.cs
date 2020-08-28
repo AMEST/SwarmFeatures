@@ -54,7 +54,7 @@ namespace SwarmFeatures.SwarmAutoProxy
 
                 lock (_cacheNode)
                 {
-                    _cacheNode = hosts.FirstOrDefault(host =>
+                    _cacheNode = hosts.OrderBy(a => Guid.NewGuid()).FirstOrDefault(host =>
                         host.Availability.Equals("active", StringComparison.OrdinalIgnoreCase));
                 }
 
