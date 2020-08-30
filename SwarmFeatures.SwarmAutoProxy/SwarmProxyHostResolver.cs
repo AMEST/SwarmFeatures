@@ -105,7 +105,8 @@ namespace SwarmFeatures.SwarmAutoProxy
                 return new ProxyHost
                 {
                     Address = $"{taskNode.Address}:{port.PublishedPort}",
-                    Hostname = service.Labels[ProxyLabels.Hostname]
+                    Hostname = service.Labels[ProxyLabels.Hostname],
+                    ServiceName = service.Name
                 };
 
             return new ProxyHost
