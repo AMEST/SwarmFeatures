@@ -17,5 +17,7 @@ namespace SwarmFeatures.SwarmControl.DockerEntity
         public Dictionary<string, string> Labels { get; set; }
 
         public List<PortConfiguration> Ports { get; set; }
+
+        public IEnumerable<DockerTask> Tasks { get; set; }
     }
 }

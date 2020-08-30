@@ -17,6 +17,7 @@ namespace SwarmFeatures.SwarmControl.Mappings
                 cfg.AddProfile<DockerNodeMapperProfile>();
                 cfg.AddProfile<DockerNodeResourcesMapperProfile>();
                 cfg.AddProfile<DockerPlatformMapperProfile>();
+                cfg.AddProfile<DockerTaskMapperProfile>();
             });
             Mapper = config.CreateMapper();
         }
@@ -51,6 +52,11 @@ namespace SwarmFeatures.SwarmControl.Mappings
         public static DockerNode ToEntity(this NodeListResponse source)
         {
             return Mapper.Map<DockerNode>(source);
+        }
+
+        public static List<DockerTask> ToEntity(this IEnumerable<TaskResponse> source)
+        {
+            return Mapper.Map<List<DockerTask>>(source);
         }
     }
 }

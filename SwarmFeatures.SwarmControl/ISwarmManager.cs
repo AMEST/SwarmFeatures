@@ -15,5 +15,7 @@ namespace SwarmFeatures.SwarmControl
         Task<DockerService> GetServiceById(string id);
 
         Task<IEnumerable<DockerNode>> GetNodes();
+
+        Task<DockerNode> GetNodeById(string id);
     }
 }

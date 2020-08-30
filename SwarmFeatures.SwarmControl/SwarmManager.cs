@@ -27,6 +27,9 @@ namespace SwarmFeatures.SwarmControl
         {
             var service = await GetService(dockerService);
 
+            if (service == null)
+                return;
+
             var serviceUpdateParams = new ServiceUpdateParameters
             {
                 Service = service.Spec,
@@ -45,24 +48,51 @@ namespace SwarmFeatures.SwarmControl
         public async Task<List<DockerService>> GetDockerServices()
         {
             var services = await _dockerClient.Value.Swarm.ListServicesAsync();
-            return services.ToEntity();
+            var servicesEntity = services?.ToEntity();
+
+            if (servicesEntity == null)
+                return null;
+
+            foreach (var service in servicesEntity)
+            {
+                service.Tasks = await GetServiceTask(service.Id);
+            }
+
+            return servicesEntity;
         }
 
         public async Task<DockerService> GetServiceById(string id)
         {
-            return (await GetService(new DockerService {Id = id})).ToEntity();
+            var service = (await GetService(new DockerService {Id = id})).ToEntity();
+            if (service != null)
+                service.Tasks = await GetServiceTask(service.Id);
+            return service;
         }
 
         public async Task<IEnumerable<DockerNode>> GetNodes()
         {
             var nodes = await _dockerClient.Value.Swarm.ListNodesAsync();
-            return nodes.ToEntity();
+            return nodes?.ToEntity();
+        }
+
+        public async Task<DockerNode> GetNodeById(string id)
+        {
+            var node = (await GetNodes())?.SingleOrDefault(n =>
+                n.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+            return node;
         }
 
         private async Task<SwarmService> GetService(DockerService dockerService)
         {
             return (await _dockerClient.Value.Swarm.ListServicesAsync())
-                .FirstOrDefault(s => s.ID.Equals(dockerService.Id));
+                ?.FirstOrDefault(s => s.ID.Equals(dockerService.Id));
+        }
+
+        private async Task<List<DockerTask>> GetServiceTask(string serviceId)
+        {
+            var tasks = (await _dockerClient.Value.Tasks.ListAsync())?.Where(task =>
+                task.ServiceID.Equals(serviceId, StringComparison.OrdinalIgnoreCase));
+            return tasks?.ToEntity();
         }
     }
 }

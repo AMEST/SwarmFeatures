@@ -84,12 +84,33 @@ namespace SwarmFeatures.SwarmAutoProxy
             if (!service.Ports.Any())
                 return new ProxyHost();
 
-            var port = service.Ports[0];
-            var address = $"{node.Address}:{port.PublishedPort}";
+            var randomTask = service.Tasks?
+                .Where(t => t.State == DockerTaskState.Running)
+                .OrderBy(t => Guid.NewGuid())
+                .FirstOrDefault();
+
+            var port = service.Ports.First();
+
+            if (randomTask == null)
+                return new ProxyHost
+                {
+                    Address = $"{node.Address}:{port.PublishedPort}",
+                    Hostname = service.Labels[ProxyLabels.Hostname],
+                    ServiceName = service.Name
+                };
+
+
+            var taskNode = _manager.GetNodeById(randomTask.NodeID).GetAwaiter().GetResult();
+            if (taskNode != null)
+                return new ProxyHost
+                {
+                    Address = $"{taskNode.Address}:{port.PublishedPort}",
+                    Hostname = service.Labels[ProxyLabels.Hostname]
+                };
 
             return new ProxyHost
             {
-                Address = address,
+                Address = $"{node.Address}:{port.PublishedPort}",
                 Hostname = service.Labels[ProxyLabels.Hostname],
                 ServiceName = service.Name
             };
