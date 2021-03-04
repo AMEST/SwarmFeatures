@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 
@@ -6,9 +8,10 @@ namespace SwarmFeatures.SwarmAutoProxy
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            ThreadPool.SetMinThreads(15, 10);
+            await CreateWebHostBuilder(args).Build().RunAsync();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)

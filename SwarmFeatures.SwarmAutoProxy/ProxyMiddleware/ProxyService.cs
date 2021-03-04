@@ -3,22 +3,40 @@
 
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 
 namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
 {
-    public class ProxyService
+    public class ProxyService : IDisposable
     {
+        private HttpClient _httpClient;
         public ProxyService(IOptions<SharedProxyOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             Options = options.Value;
-            Client = new HttpClient(Options.MessageHandler ?? new HttpClientHandler
-                                        {AllowAutoRedirect = false, UseCookies = false});
+        }
+
+        public HttpClient GetOrCreate(Action<HttpClientHandler> configure)
+        {
+            if (_httpClient != null)
+                return _httpClient;
+            var handler = new HttpClientHandler();
+            configure?.Invoke(handler);
+            _httpClient = new HttpClient(handler);
+            _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+            {
+                NoCache = true
+            };
+            return _httpClient;
         }
 
         public SharedProxyOptions Options { get; private set; }
-        internal HttpClient Client { get; private set; }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
+        }
     }
 }

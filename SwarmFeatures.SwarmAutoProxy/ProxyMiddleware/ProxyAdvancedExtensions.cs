@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading;
@@ -53,9 +54,10 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
 
             // Copy the request headers
             foreach (var header in request.Headers)
-                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) &&
-                    requestMessage.Content != null && !header.Key.Equals("Cookie"))
+            {
+                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()))
                     requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+            }
 
             requestMessage.Headers.Host = uri.Authority;
             requestMessage.RequestUri = uri;
@@ -139,14 +141,21 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
             }
         }
 
-        public static Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context,
+        public static async Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context,
             HttpRequestMessage requestMessage)
         {
             if (requestMessage == null) throw new ArgumentNullException(nameof(requestMessage));
 
             var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
+            var cookieContainer = new CookieContainer();
+            if (context.Request.Headers.TryGetValue("Cookie", out var cookieValue))
+            {
+                cookieContainer.SetCookies(requestMessage.RequestUri, cookieValue);
+            }
 
-            return proxyService.Client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead,
+            using var client = proxyService.GetOrCreate(handler => handler.CookieContainer = cookieContainer);
+
+            return await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead,
                 context.RequestAborted);
         }
 

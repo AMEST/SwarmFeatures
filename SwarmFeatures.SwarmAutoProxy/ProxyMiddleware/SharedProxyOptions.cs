@@ -18,7 +18,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         /// <summary>
         /// Message handler used for http message forwarding.
         /// </summary>
-        public HttpMessageHandler MessageHandler { get; set; }
+        public HttpClientHandler MessageHandler { get; set; }
 
         /// <summary>
         /// Allows to modify HttpRequestMessage before it is sent to the Message Handler.

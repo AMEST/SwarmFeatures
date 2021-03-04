@@ -45,28 +45,28 @@ namespace SwarmFeatures.SwarmAutoProxy
 
         private async Task<List<ProxyHost>> GetAllProxyHost()
         {
-            if (_proxyHostsCache == null || _proxyHostsCache != null && _proxyHostsCache.IsEmpty ||
-                _cacheTime.AddSeconds(10).ToUnixTimeSeconds() < DateTimeOffset.Now.ToUnixTimeSeconds())
+            if (_proxyHostsCache != null && (_proxyHostsCache == null || !_proxyHostsCache.IsEmpty) &&
+                _cacheTime.AddSeconds(10).ToUnixTimeSeconds() >= DateTimeOffset.Now.ToUnixTimeSeconds())
+                return _proxyHostsCache.ToList();
+
+            var allServices = await _manager.GetDockerServices();
+
+            var hosts = await _manager.GetNodes();
+
+            lock (_cacheNode)
             {
-                var allServices = await _manager.GetDockerServices();
-
-                var hosts = await _manager.GetNodes();
-
-                lock (_cacheNode)
-                {
-                    _cacheNode = hosts.OrderBy(a => Guid.NewGuid()).FirstOrDefault(host =>
-                        host.Availability.Equals("active", StringComparison.OrdinalIgnoreCase));
-                }
-
-                _proxyHostsCache = new ConcurrentBag<ProxyHost>(allServices.Where(service =>
-                        service.Labels.ContainsKey(ProxyLabels.Enable)
-                        && service.Labels.ContainsKey(ProxyLabels.Hostname)
-                        && bool.Parse(service.Labels[ProxyLabels.Enable]))
-                    .Select(service => CreateHost(service, _cacheNode)).ToList());
-
-                _cacheTime = DateTimeOffset.Now;
-                _logger.Debug("Proxied hosts list updated!");
+                _cacheNode = hosts.OrderBy(a => Guid.NewGuid()).FirstOrDefault(host =>
+                    host.Availability.Equals("active", StringComparison.OrdinalIgnoreCase));
             }
+
+            _proxyHostsCache = new ConcurrentBag<ProxyHost>(allServices.Where(service =>
+                    service.Labels.ContainsKey(ProxyLabels.Enable)
+                    && service.Labels.ContainsKey(ProxyLabels.Hostname)
+                    && bool.Parse(service.Labels[ProxyLabels.Enable]))
+                .Select(service => CreateHost(service, _cacheNode)).ToList());
+
+            _cacheTime = DateTimeOffset.Now;
+            _logger.Debug("Proxied hosts list updated!");
 
             return _proxyHostsCache.ToList();
         }

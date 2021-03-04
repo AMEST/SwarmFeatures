@@ -22,7 +22,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
             if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
 
             services.Configure(configureOptions);
-            return services.AddSingleton<ProxyService>();
+            return services.AddScoped<ProxyService>();
         }
     }
 }
