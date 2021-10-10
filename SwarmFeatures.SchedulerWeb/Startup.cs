@@ -23,7 +23,7 @@ namespace SwarmFeatures.SchedulerWeb
             services.AddSwarmControlModule(configuration);
             services.AddSwarmSchedulerModule();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,7 +31,10 @@ namespace SwarmFeatures.SchedulerWeb
         {
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>{
+                endpoints.MapControllers();
+            });
         }
     }
 }

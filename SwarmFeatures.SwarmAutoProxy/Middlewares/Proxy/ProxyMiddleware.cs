@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
 using SwarmFeatures.SwarmAutoProxy.Extensions;
+using SwarmFeatures.SwarmAutoProxy.Services;
 using System;
 using System.Threading.Tasks;
 
-namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
+namespace SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy
 {
     /// <summary>
     /// Proxy Middleware
@@ -39,18 +40,18 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
             _options = options.Value;
         }
 
-        public Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             Uri uri;
             if (!_options.Host.HasValue)
             {
-                var resolvedHost = _hostResolver.Resolve(context.Request.Host.Value.IgnorePort()).GetAwaiter()
-                    .GetResult();
-
-                if (resolvedHost == null)
-                    return _next(context);
+                var resolvedHost = await _hostResolver.Resolve(context.Request.Host.Value.IgnorePort());
+                if (resolvedHost == null){
+                    await _next(context);
+                    return;
+                }
 
                 var scheme = "http";
                 if (context.WebSockets.IsWebSocketRequest)
@@ -69,7 +70,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
                     context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
             }
 
-            return context.ProxyRequest(uri);
+            await context.ProxyRequest(uri);
         }
     }
 }

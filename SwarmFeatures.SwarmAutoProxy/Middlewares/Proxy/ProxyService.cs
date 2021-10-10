@@ -6,11 +6,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 
-namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
+namespace SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy
 {
     public class ProxyService : IDisposable
     {
         private HttpClient _httpClient;
+        private readonly object _lock = new object();
         public ProxyService(IOptions<SharedProxyOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
@@ -22,14 +23,20 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         {
             if (_httpClient != null)
                 return _httpClient;
-            var handler = new HttpClientHandler();
-            configure?.Invoke(handler);
-            _httpClient = new HttpClient(handler);
-            _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+            lock (_lock)
             {
-                NoCache = true
-            };
-            return _httpClient;
+                if (_httpClient != null)
+                    return _httpClient;
+
+                var handler = new HttpClientHandler();
+                configure?.Invoke(handler);
+                _httpClient = new HttpClient(handler);
+                _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+                {
+                    NoCache = true
+                };
+                return _httpClient;
+            }
         }
 
         public SharedProxyOptions Options { get; private set; }

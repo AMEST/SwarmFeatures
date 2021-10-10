@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SwarmFeatures.SwarmAutoProxy.Data;
 
-namespace SwarmFeatures.SwarmAutoProxy
+namespace SwarmFeatures.SwarmAutoProxy.Services
 {
     public interface IProxyHostResolver
     {

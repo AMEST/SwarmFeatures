@@ -4,7 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
+namespace SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy
 {
     public static class ProxyServiceCollectionExtensions
     {
@@ -12,7 +12,7 @@ namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton<ProxyService>();
+            return services.AddScoped<ProxyService>();
         }
 
         public static IServiceCollection AddProxy(this IServiceCollection services,

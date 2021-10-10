@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SwarmFeatures.SwarmAutoProxy.Configuration;
-using SwarmFeatures.SwarmAutoProxy.ProxyMiddleware;
+using SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy;
 using SwarmFeatures.SwarmControl.Extensions;
 using System.Net.Http;
 using SwarmFeatures.SwarmAutoProxy.Extensions;
@@ -38,7 +38,7 @@ namespace SwarmFeatures.SwarmAutoProxy
                         (httpRequestMessage, cert, cetChain, policyErrors) => true
                 };
             });
-            services.AddMvc();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +48,10 @@ namespace SwarmFeatures.SwarmAutoProxy
 
             app.UseWebSockets();
             app.RunProxy();
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints( endpoints =>{
+                endpoints.MapControllers();
+            });
             app.Run(async (context) => { await context.Response.WriteAsync("404 - Proxy Not Found"); });
         }
     }
