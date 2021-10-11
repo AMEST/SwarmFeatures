@@ -42,7 +42,7 @@ namespace SwarmFeatures.SwarmAutoProxy.Services
         {
             if (_cacheUpdateInProgress)
                 return;
-            if (_cacheTime.AddSeconds(10).ToUnixTimeSeconds() >= DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            if (_cacheTime.AddMinutes(1).ToUnixTimeSeconds() >= DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                 return;
             try
             {
