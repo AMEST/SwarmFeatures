@@ -8,46 +8,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using ILogger = Serilog.ILogger;
 
-namespace SwarmFeatures.SwarmAutoProxy
+namespace SwarmFeatures.SwarmAutoProxy.Services
 {
     public class SwarmProxyHostResolver : IProxyHostResolver
     {
         private readonly ISwarmManager _manager;
-
         private readonly ILogger _logger;
-
-        private ConcurrentBag<ProxyHost> _proxyHostsCache;
-
+        private ConcurrentBag<ProxyHost> _proxyHostsCache = new ConcurrentBag<ProxyHost>();
         private DockerNode _cacheNode = new DockerNode();
-
         private DateTimeOffset _cacheTime;
+        private bool _cacheUpdateInProgress;
 
         public SwarmProxyHostResolver(ISwarmManager manager, ILogger logger)
         {
             _manager = manager;
             _logger = logger.ForContext<SwarmProxyHostResolver>();
-            _cacheTime = DateTimeOffset.Now;
+            _cacheTime = DateTimeOffset.MinValue;
         }
 
         public async Task<ProxyHost> Resolve(string host)
         {
-            var services = await GetAllProxyHost();
-
-            return services.FirstOrDefault(s => s.Hostname.Equals(host, StringComparison.OrdinalIgnoreCase));
+            await Update();
+            return _proxyHostsCache.FirstOrDefault(s => s.Hostname.Equals(host, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task<List<ProxyHost>> GetAll()
         {
-            var services = await GetAllProxyHost();
-
-            return services;
+            await Update();
+            return _proxyHostsCache.ToList();
         }
 
-        private async Task<List<ProxyHost>> GetAllProxyHost()
+        private async Task Update()
         {
-            if (_proxyHostsCache == null || _proxyHostsCache != null && _proxyHostsCache.IsEmpty ||
-                _cacheTime.AddSeconds(10).ToUnixTimeSeconds() < DateTimeOffset.Now.ToUnixTimeSeconds())
+            if (_cacheUpdateInProgress)
+                return;
+            if (_cacheTime.AddMinutes(1).ToUnixTimeSeconds() >= DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                return;
+            try
             {
+                _cacheUpdateInProgress = true;
                 var allServices = await _manager.GetDockerServices();
 
                 var hosts = await _manager.GetNodes();
@@ -57,21 +56,27 @@ namespace SwarmFeatures.SwarmAutoProxy
                     _cacheNode = hosts.OrderBy(a => Guid.NewGuid()).FirstOrDefault(host =>
                         host.Availability.Equals("active", StringComparison.OrdinalIgnoreCase));
                 }
-
-                _proxyHostsCache = new ConcurrentBag<ProxyHost>(allServices.Where(service =>
+                var proxiedServices = allServices.Where(service =>
                         service.Labels.ContainsKey(ProxyLabels.Enable)
                         && service.Labels.ContainsKey(ProxyLabels.Hostname)
-                        && bool.Parse(service.Labels[ProxyLabels.Enable]))
-                    .Select(service => CreateHost(service, _cacheNode)).ToList());
+                        && bool.Parse(service.Labels[ProxyLabels.Enable])).ToArray();
+                _proxyHostsCache.Clear();
+                foreach (var service in proxiedServices)
+                {
+                    var host = await CreateHost(service, _cacheNode);
+                    _proxyHostsCache.Add(host);
+                }
 
-                _cacheTime = DateTimeOffset.Now;
+                _cacheTime = DateTimeOffset.UtcNow;
                 _logger.Debug("Proxied hosts list updated!");
             }
-
-            return _proxyHostsCache.ToList();
+            finally
+            {
+                _cacheUpdateInProgress = false;
+            }
         }
 
-        private ProxyHost CreateHost(DockerService service, DockerNode node)
+        private async Task<ProxyHost> CreateHost(DockerService service, DockerNode node)
         {
             if (service.Labels.ContainsKey(ProxyLabels.Address))
                 return new ProxyHost
@@ -100,7 +105,7 @@ namespace SwarmFeatures.SwarmAutoProxy
                 };
 
 
-            var taskNode = _manager.GetNodeById(randomTask.NodeID).GetAwaiter().GetResult();
+            var taskNode = await _manager.GetNodeById(randomTask.NodeID);
             if (taskNode != null)
                 return new ProxyHost
                 {

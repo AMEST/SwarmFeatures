@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SwarmFeatures.SwarmAutoProxy.Services;
 
 namespace SwarmFeatures.SwarmAutoProxy.Extensions
 {

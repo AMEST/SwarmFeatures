@@ -3,7 +3,7 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
+namespace SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy
 {
     /// <summary>
     /// Proxy Options

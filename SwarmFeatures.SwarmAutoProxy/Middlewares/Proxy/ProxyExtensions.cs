@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace SwarmFeatures.SwarmAutoProxy.ProxyMiddleware
+namespace SwarmFeatures.SwarmAutoProxy.Middlewares.Proxy
 {
     public static class ProxyExtensions
     {
